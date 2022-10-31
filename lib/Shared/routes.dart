@@ -2,6 +2,7 @@
 
 import 'package:biochemic_master/Shared/page/dashboard_page.dart';
 import 'package:biochemic_master/Shared/page/front_page.dart';
+import 'package:biochemic_master/Shared/page/lang_select.dart';
 import 'package:biochemic_master/Shared/page/splash_page.dart';
 import 'package:biochemic_master/auth/user_profile.dart';
 import 'package:biochemic_master/front_icon_page/login_page.dart';
@@ -37,6 +38,7 @@ class AppRoutes {
   static const String MyCases = "My Cases";
   static const String UserProfilePage = "User Profile Page";
   static const String ResultPage = "Result Page";
+  static const String LanguageSelect = "Language Select";
 }
 
 Map<String, WidgetBuilder> routes = {
@@ -57,4 +59,5 @@ Map<String, WidgetBuilder> routes = {
   AppRoutes.MyCases: (context) => const MyCases(),
   AppRoutes.UserProfilePage: (context) => const UserProfilePage(),
   AppRoutes.ResultPage: (context) => const ResultPage(),
+  AppRoutes.LanguageSelect: (context) => const LanguageSelect(),
 };

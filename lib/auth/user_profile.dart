@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:biochemic_master/Shared/constant.dart';
@@ -21,7 +23,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
       appBar: AppBar(
         backgroundColor: Constant.primaryColor,
         centerTitle: true,
-        title: const Text("My Profile"),
+        title: Text(
+            Constant.language == '?lang=h' ? "मेरी प्रोफाइल" : "My Profile"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -40,9 +43,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ],
               ),
               const SizedBox(height: 24),
-              const Padding(
+              Padding(
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: Text("Name",
+                  child: Text(Constant.language == '?lang=h' ? "नाम" : "Name",
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w800))),
               Padding(
@@ -53,15 +56,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: Constant.primaryColor)),
                     child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: EdgeInsets.all(16.0),
                         child: Text(
                           Constant.name,
-                          style: const TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16),
                         ))),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                child: Text("Email",
+                child: Text(Constant.language == '?lang=h' ? "ईमेल " : "Email",
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
               ),
@@ -73,14 +76,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: Constant.primaryColor)),
                     child: Padding(
-
                         padding: const EdgeInsets.all(16.0),
                         child: Text(Constant.email,
                             style: const TextStyle(fontSize: 16)))),
               ),
-              const Padding(
+              Padding(
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: Text("Password",
+                  child: Text(
+                      Constant.language == '?lang=h' ? "पासवर्ड" : "Password",
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w800))),
               Padding(
@@ -97,8 +100,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               setState(() => showPassword = !showPassword),
                           color: Constant.primaryColor),
                       contentPadding: const EdgeInsets.all(16),
-                      hintText: 'Enter Password',
-                      border: const OutlineInputBorder(
+                      hintText: Constant.language == '?lang=h'
+                          ? "पससवॉर्ड लिखे"
+                          : 'Enter Password',
+                      border: OutlineInputBorder(
                           borderSide: BorderSide(color: Constant.primaryColor)),
                       disabledBorder: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -119,7 +124,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     validator: (value) {
                       if (value == null) {
-                        return "Please Enter Password";
+                        return Constant.language == '?lang=h'
+                            ? "कृपया पासवर्ड दर्ज करे"
+                            : "Please Enter Password";
                       }
                       return null;
                     }),
@@ -132,11 +139,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                         primary: Constant.primaryColor),
-                    child: const Padding(
+                    child: Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: Text(
-                        'Update',
+                        Constant.language == '?lang=h'
+                            ? "अपडेट करें"
+                            : 'Update',
                         style: TextStyle(fontSize: 18),
                       ),
                     ),

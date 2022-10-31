@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:io';
 import 'package:biochemic_master/Shared/constant.dart';
 import 'package:biochemic_master/Shared/page/splash_page.dart';
@@ -26,9 +28,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  // HttpOverrides.global = MyHttpOverrides();
+  HttpOverrides.global = MyHttpOverrides();
   LocalDataSaver.saveLoginData(false);
-  runApp(const MyApp());
+  runApp(MyApp());
 
 // runApp(
 //   DevicePreview(
@@ -47,8 +49,8 @@ class MyApp extends StatelessWidget {
       title: appName,
       theme: ThemeData(
           primaryColor: Constant.primaryColor,
-          iconTheme: const IconThemeData(color: Constant.primaryColor)),
-      home:  const SplashPage(),
+          iconTheme: IconThemeData(color: Constant.primaryColor)),
+      home: SplashPage(),
       color: Constant.primaryColor,
       routes: routes,
       debugShowCheckedModeBanner: false,

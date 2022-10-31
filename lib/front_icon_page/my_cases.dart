@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:convert';
 import 'dart:ui';
 import 'package:biochemic_master/auth/localdb.dart';
@@ -70,23 +72,20 @@ class _MyCasesState extends State<MyCases> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Constant.primaryColor,
-        title: const Text("My Cases"),
+        title: Text(Constant.language == '?lang=h' ? "मेरे केस" : "My Cases"),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.0),
           child: Column(
             children: [
               (isLoading)
                   ? SizedBox(
                       height: MediaQuery.of(context).size.width,
                       width: MediaQuery.of(context).size.width,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4,
-                        ),
-                      ),
+                      child: Center(
+                          child: CircleProgressIndicator.circleIndicator),
                     )
                   : ListView.builder(
                       itemCount: myCasesModelList.length,
@@ -118,7 +117,9 @@ class _MyCasesState extends State<MyCases> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Case: ${myCasesModelList[index].id}",
+                                        Constant.language == '?lang=h'
+                                            ? "केस: ${myCasesModelList[index].id}"
+                                            : "Case: ${myCasesModelList[index].id}",
                                         style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w800),
@@ -145,7 +146,9 @@ class _MyCasesState extends State<MyCases> {
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        "Symps",
+                                        Constant.language == '?lang=h'
+                                            ? "लक्षण"
+                                            : "Symps",
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white),

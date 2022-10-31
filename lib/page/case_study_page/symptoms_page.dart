@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, unnecessary_null_comparison
+
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:biochemic_master/Shared/constant.dart';
@@ -23,47 +25,14 @@ class _SymptomsPageState extends State<SymptomsPage> {
   var dateValue = '';
   ChapterModel? _chapterModel;
   bool isLoading = false;
+  bool isAvailable = true;
   int index = 1;
-  var checkId =
-      (Constant.id != '' || Constant.id == null || Constant.id.isEmpty);
-
-  List<IndicationModel> indicationList = [];
-
-  Future getIndication() async {
-    indicationList.clear();
-    if (_chapterModel != null) {
-      setState(() {
-        isLoading = true;
-      });
-      Uri myUri = Uri.parse(
-          "${NetworkUtil.getIndicationUrl}cat_id=${_chapterModel!.id}");
-      Response response = await get(myUri);
-      if (response.statusCode == 200) {
-        debugPrint("getIndication Status Code: ${response.statusCode}");
-        debugPrint("getIndication Response Body: ${response.body}");
-        List values = [];
-        values = jsonDecode(response.body);
-        if (values.isNotEmpty) {
-          for (int i = 0; i < values.length; i++) {
-            if (values[i] != null) {
-              Map<String, dynamic> map = values[i];
-              indicationList.add(IndicationModel.fromJson(map));
-              setState(() {
-                indicationList;
-              });
-              setState(() {
-                isLoading = false;
-              });
-            }
-          }
-        }
-      }
-      getUnSelectedChapterSymptoms();
-      getSelectedChapterSymptoms();
-    }
-  }
+  bool isFetching = false;
 
   Future fetchSymptomRecorded(int index) async {
+    setState(() {
+      isFetching = true;
+    });
     Uri myUri = Uri.parse(
         // "${NetworkUtil.fetchSymptomRecordedUrl}device_id=$deviceValue&indi_id=${getUnSelectedSymptomsList[index].id}&rem_id=${getUnSelectedSymptomsList[index].remId}&cat_id=${_chapterModel.id}&created_on=$dateValue");
         "${NetworkUtil.fetchSymptomRecordedUrl}user_id=${Constant.id}&indi_id=${getUnSelectedSymptomsList[index].id}&rem_id=${getUnSelectedSymptomsList[index].remId}&cat_id=${_chapterModel!.id}&created_on=$dateValue");
@@ -79,10 +48,16 @@ class _SymptomsPageState extends State<SymptomsPage> {
         getSelectedChapterSymptoms();
         getUnSelectedChapterSymptoms();
 
-        Fluttertoast.showToast(msg: map['message']);
+        Fluttertoast.showToast(
+            msg: Constant.language == '?lang=h'
+                ? 'लक्षण दर्ज किया गया'
+                : map['message']);
 
         if (response.statusCode == 200 &&
             map['message'] == "Symptom Recorded") {
+          setState(() {
+            isFetching = false;
+          });
           Navigator.canPop(context);
         }
       }
@@ -96,35 +71,14 @@ class _SymptomsPageState extends State<SymptomsPage> {
     debugPrint("DateFormat: $dateValue");
   }
 
-  List<CheckBoxModel> checkBoxModelList = [];
-
-  Future fetchCheckBoxDetails() async {
-    checkBoxModelList.clear();
-    Uri myUri = Uri.parse(
-        "https://mettlecrowsolutions.com/apps/apis/biochem_new/get-selected-symps.php?cat_id=${_chapterModel!.id}&user_id=${Constant.id}");
-    Response response = await get(myUri);
-    if (response.statusCode == 200) {
-      debugPrint("fetchCheckBoxDetails Status Code: ${response.statusCode}");
-      debugPrint("fetchCheckBoxDetails Response Body:} :: ${response.body}");
-      List<dynamic> values = <dynamic>[];
-      values = jsonDecode(response.body);
-      if (values.isNotEmpty) {
-        for (int i = 0; i < values.length; i++) {
-          if (values[i] != null) {
-            Map<String, dynamic> map = values[i];
-            checkBoxModelList.add(CheckBoxModel.fromJson(map));
-          }
-        }
-      }
-    }
-  }
-
   List<GetUnSelectedChapterSymptomsModel> getUnSelectedSymptomsList = [];
+  bool isUnSelectAvailable = true;
 
   Future getUnSelectedChapterSymptoms() async {
     getUnSelectedSymptomsList.clear();
     setState(() {
       isLoading = true;
+      isUnSelectAvailable = true;
     });
     Uri myUri = Uri.parse(
         "${NetworkUtil.getUnSelectedChapterSymptomsUrl}cat_id=${_chapterModel!.id}&user_id=${Constant.id}");
@@ -135,20 +89,27 @@ class _SymptomsPageState extends State<SymptomsPage> {
 
       List values = [];
       values = jsonDecode(response.body);
-      if (values.isNotEmpty) {
-        for (int i = 0; i < values.length; i++) {
-          if (values[i] != null) {
-            Map<String, dynamic> map = values[i];
-            getUnSelectedSymptomsList
-                .add(GetUnSelectedChapterSymptomsModel.fromJson(map));
-            getUnSelectedSymptomsList;
-            debugPrint(getUnSelectedSymptomsList.length.toString());
-            setState(() {
+      if (response.body.isEmpty || response.body == "[]") {
+        setState(() {
+          isLoading = false;
+          isUnSelectAvailable = false;
+        });
+      } else {
+        if (values.isNotEmpty) {
+          for (int i = 0; i < values.length; i++) {
+            if (values[i] != null) {
+              Map<String, dynamic> map = values[i];
+              getUnSelectedSymptomsList
+                  .add(GetUnSelectedChapterSymptomsModel.fromJson(map));
               getUnSelectedSymptomsList;
-            });
-            setState(() {
-              isLoading = false;
-            });
+              debugPrint(getUnSelectedSymptomsList.length.toString());
+              setState(() {
+                getUnSelectedSymptomsList;
+              });
+              setState(() {
+                isLoading = false;
+              });
+            }
           }
         }
       }
@@ -156,11 +117,13 @@ class _SymptomsPageState extends State<SymptomsPage> {
   }
 
   List<GetSelectedChapterSymptomsModel> getSelectedSymptomsList = [];
+  bool isSelectAvailable = true;
 
   Future getSelectedChapterSymptoms() async {
     getSelectedSymptomsList.clear();
     setState(() {
       isLoading = true;
+      isSelectAvailable = true;
     });
     Uri myUri = Uri.parse(
         "${NetworkUtil.getSelectedChapterSymptomsUrl}cat_id=${_chapterModel!.id}&user_id=${Constant.id}");
@@ -172,18 +135,25 @@ class _SymptomsPageState extends State<SymptomsPage> {
 
       List values = [];
       values = jsonDecode(response.body);
-      if (values.isNotEmpty) {
-        for (int i = 0; i < values.length; i++) {
-          if (values[i] != null) {
-            Map<String, dynamic> map = values[i];
-            getSelectedSymptomsList
-                .add(GetSelectedChapterSymptomsModel.fromJson(map));
-            getSelectedSymptomsList;
-            debugPrint(getSelectedSymptomsList.length.toString());
-            setState(() {});
-            setState(() {
-              isLoading = false;
-            });
+      if (response.body.isEmpty || response.body == "[]") {
+        setState(() {
+          isLoading = false;
+          isSelectAvailable = false;
+        });
+      } else {
+        if (values.isNotEmpty) {
+          for (int i = 0; i < values.length; i++) {
+            if (values[i] != null) {
+              Map<String, dynamic> map = values[i];
+              getSelectedSymptomsList
+                  .add(GetSelectedChapterSymptomsModel.fromJson(map));
+              getSelectedSymptomsList;
+              debugPrint(getSelectedSymptomsList.length.toString());
+              setState(() {});
+              setState(() {
+                isLoading = false;
+              });
+            }
           }
         }
       }
@@ -200,7 +170,10 @@ class _SymptomsPageState extends State<SymptomsPage> {
       Map<String, dynamic> map =
           jsonDecode(response.body) as Map<String, dynamic>;
       if (map != null && map['message'] != null && map["success"] != null) {
-        Fluttertoast.showToast(msg: map['message']);
+        Fluttertoast.showToast(
+            msg: Constant.language == '?lang=h'
+                ? 'लक्षण अचयनित किया गया'
+                : map['message']);
 
         if (response.statusCode == 200 &&
             map['message'] == "Symptom Unselected.") {
@@ -214,7 +187,6 @@ class _SymptomsPageState extends State<SymptomsPage> {
       }
     }
   }
-
 
   @override
   void initState() {
@@ -231,13 +203,18 @@ class _SymptomsPageState extends State<SymptomsPage> {
   @override
   Widget build(BuildContext context) {
     if (_chapterModel == null) {
-      _chapterModel = ModalRoute.of(context)?.settings.arguments as ChapterModel?;
-      getIndication();
+      setState(() {
+        _chapterModel =
+            ModalRoute.of(context)?.settings.arguments as ChapterModel?;
+      });
+      if (_chapterModel != null) {
+        getIndication();
+      }
     }
     return DefaultTabController(
       length: 2,
       child: WillPopScope(
-        onWillPop: (){
+        onWillPop: () {
           return _onBackPressed()!;
         },
         child: Scaffold(
@@ -245,25 +222,53 @@ class _SymptomsPageState extends State<SymptomsPage> {
             backgroundColor: Constant.primaryColor,
             title: Text(_chapterModel!.chapter!),
             centerTitle: true,
-            bottom: const TabBar(
+            bottom: TabBar(
               indicatorColor: Constant.secondaryColor,
               unselectedLabelColor: Constant.secondaryColor,
               indicatorSize: TabBarIndicatorSize.tab,
               tabs: [
-                Tab(text: "UnSelect Symptoms"),
-                Tab(text: "Selected Symptoms")
+                Tab(
+                    text: Constant.language == '?lang=h'
+                        ? "अचयनित लक्षण"
+                        : "UnSelect Symptoms"),
+                Tab(
+                    text: Constant.language == '?lang=h'
+                        ? "चयनित लक्षण"
+                        : "Selected Symptoms")
               ],
             ),
           ),
           body: TabBarView(
             children: [
-              getUnSelectedTabSymptoms(),
-              getSelectedTabSymptoms(),
+              isAvailable == false
+                  ? Center(
+                      child: buildText("के लिए कोई अचयनित लक्षण नहीं मिला",
+                          "Not find any Unselect Symptoms for "))
+                  : getUnSelectedTabSymptoms(),
+              isAvailable == false
+                  ? Center(
+                      child: buildText("के लिए कोई चयनित लक्षण नहीं मिला",
+                          "Not find any Selected Symptoms for "))
+                  : getSelectedTabSymptoms(),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget buildText(hindiText, engText) {
+    return Text(
+        Constant.language == '?lang=h'
+            ? "${_chapterModel!.chapter!} $hindiText"
+            : "$engText ${_chapterModel!.chapter!}",
+        maxLines: 3,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18));
+  }
+
+  String selectText(hindiT, engT) {
+    return Constant.language == '?lang=h' ? hindiT : engT;
   }
 
   Widget getSelectedTabSymptoms() {
@@ -272,91 +277,82 @@ class _SymptomsPageState extends State<SymptomsPage> {
         children: [
           if (isLoading == true)
             SizedBox(
-              height: MediaQuery.of(context).size.height / 1.5,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: Container(),
-                  ),
-                  const CircularProgressIndicator(strokeWidth: 4),
-                  Expanded(
-                    child: Container(),
-                  ),
-                ],
-              ),
-            )
+                height: MediaQuery.of(context).size.height / 1.5,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(child: Container()),
+                    CircleProgressIndicator.circleIndicator,
+                    Expanded(child: Container()),
+                  ],
+                ))
           else if (getSelectedSymptomsList.isNotEmpty)
             ListView.builder(
                 itemCount: getSelectedSymptomsList.length,
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
-                physics: const NeverScrollableScrollPhysics(),
+                physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   GetSelectedChapterSymptomsModel items =
                       getSelectedSymptomsList[index];
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                     child: Card(
                       color: Constant.primaryColor,
                       shape: CardShape.shape,
                       shadowColor: Constant.primaryColor,
                       elevation: CardShape.elevation,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text("${index + 1}",
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 18)),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Expanded(
                                 child: Text(items.indication!,
                                     // maxLines: 2,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18))),
                             GestureDetector(
                                 onTap: () {
                                   AwesomeDialog(
                                       context: context,
-                                      dialogType: DialogType.WARNING,
+                                      dialogType: DialogType.warning,
                                       headerAnimationLoop: false,
-                                      animType: AnimType.BOTTOMSLIDE,
-                                      title: 'Warning',
-                                      titleTextStyle: const TextStyle(
+                                      animType: AnimType.bottomSlide,
+                                      title: Constant.language == '?lang=h'
+                                          ? "चेतावनी"
+                                          : 'Warning',
+                                      titleTextStyle: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20),
-                                      desc:
-                                          'Are you sure to remove select symptom?',
-                                      descTextStyle: const TextStyle(
+                                      desc: Constant.language == '?lang=h'
+                                          ? "क्या आप निश्चित रूप से चुनिंदा लक्षण को हटाना चाहते हैं?"
+                                          : 'Are you sure to remove selected symptom?',
+                                      descTextStyle: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600),
                                       buttonsTextStyle:
-                                          const TextStyle(color: Colors.black),
+                                          TextStyle(color: Colors.black),
                                       showCloseIcon: true,
                                       btnCancelOnPress: () {},
+                                      btnOkText: selectText("हाँ", "OK"),
+                                      btnCancelText:
+                                          selectText("नहीं", "Cancel"),
                                       btnOkOnPress: () {
-                                        if (
-                                            Constant.id == null ||
-                                            Constant.id.isEmpty||
-                                                Constant.id =='') {
-                                          Fluttertoast.showToast(
-                                              msg: "Please Login First");
-                                          Navigator.pushReplacementNamed(
-                                              context, AppRoutes.LoginPage);
-                                        } else {
-                                          setState(() {
-                                            fetchDeleteSymp(items.id);
-                                          });
-                                        }
+                                        setState(() {
+                                          fetchDeleteSymp(items.id);
+                                        });
                                       }).show();
                                 },
-                                child: const Icon(Icons.delete,
+                                child: Icon(Icons.delete,
                                     size: 20, color: Colors.red))
                           ],
                         ),
@@ -364,7 +360,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
                     ),
                   );
                 })
-          else
+          else if (isSelectAvailable == false)
             SizedBox(
               height: MediaQuery.of(context).size.height / 1.5,
               width: MediaQuery.of(context).size.width,
@@ -373,10 +369,11 @@ class _SymptomsPageState extends State<SymptomsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Expanded(child: Container()),
-                  const Text("No symptoms are selected in this Chapter.",
-                      maxLines: 3,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18)),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+                      child: findText(
+                          "इस अध्याय में किसी भी लक्षण का चयन नहीं किया गया है।",
+                          "No symptoms are selected in this Chapter.")),
                   Expanded(child: Container()),
                 ],
               ),
@@ -399,7 +396,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Expanded(child: Container()),
-                  const CircularProgressIndicator(strokeWidth: 4),
+                  CircleProgressIndicator.circleIndicator,
                   Expanded(child: Container()),
                 ],
               ),
@@ -409,20 +406,19 @@ class _SymptomsPageState extends State<SymptomsPage> {
               itemCount: getUnSelectedSymptomsList.length,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 GetUnSelectedChapterSymptomsModel item =
                     getUnSelectedSymptomsList[index];
                 return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                   child: Card(
                     color: Constant.primaryColor,
                     shape: CardShape.shape,
                     shadowColor: Constant.primaryColor,
                     elevation: CardShape.elevation,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -431,22 +427,22 @@ class _SymptomsPageState extends State<SymptomsPage> {
                               value: item.isCheck == true,
                               onChanged: (bool? value) {
                                 setState(() {
-                                  item.isCheck = value;
-                                  if (value == true) {
-                                    if (Constant.id == null ||
-                                        Constant.id.isEmpty||
-                                        Constant.id =='') {
-                                      Fluttertoast.showToast(
-                                          msg: "Please Login First");
-                                      Navigator.pushReplacementNamed(
-                                          context, AppRoutes.LoginPage);
-                                    } else {
-                                      fetchSymptomRecorded(index);
-                                    }
+                                  // isFetching == true
+                                  //     ? SizedBox()
+                                  //     : item.isCheck = value;
+                                  // if (value == true) {
+                                  //   isFetching == true
+                                  //       ? SizedBox()
+                                  //       : fetchSymptomRecorded(index);
+                                  if (isFetching == false) {
+                                    item.isCheck = value;
+                                    fetchSymptomRecorded(index);
                                   }
                                   if (value == false) {
                                     Fluttertoast.showToast(
-                                        msg: 'Symptom Removed');
+                                        msg: Constant.language == '?lang=h'
+                                            ? 'लक्षण हटाया गया'
+                                            : 'Symptom Removed');
                                   }
                                 });
                               }),
@@ -455,9 +451,8 @@ class _SymptomsPageState extends State<SymptomsPage> {
                               item.indication!,
                               // maxLines: 2,
                               // overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ),
                         ],
@@ -467,7 +462,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
                 );
               },
             )
-          else
+          else if (isUnSelectAvailable == false)
             SizedBox(
               height: MediaQuery.of(context).size.height / 1.5,
               width: MediaQuery.of(context).size.width,
@@ -476,10 +471,12 @@ class _SymptomsPageState extends State<SymptomsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Expanded(child: Container()),
-                  const Text("No more symptom to select in this chapter.",
-                      maxLines: 3,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18)),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+                    child: findText(
+                        "इस अध्याय में चुनने के लिए और कोई लक्षण नहीं है।",
+                        "No more symptom to select in this chapter."),
+                  ),
                   Expanded(child: Container()),
                 ],
               ),
@@ -488,7 +485,82 @@ class _SymptomsPageState extends State<SymptomsPage> {
       ),
     );
   }
+
+  Widget findText(hindiText, engText) {
+    return Text(Constant.language == '?lang=h' ? hindiText : engText,
+        maxLines: 3,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18));
+  }
+
+  List<IndicationModel> indicationList = [];
+
+  Future getIndication() async {
+    indicationList.clear();
+    if (_chapterModel != null) {
+      setState(() {
+        isLoading = true;
+        isAvailable = true;
+      });
+      Uri myUri = Uri.parse(
+          "${NetworkUtil.getIndicationUrl}cat_id=${_chapterModel!.id}");
+      Response response = await get(myUri);
+      if (response.statusCode == 200) {
+        debugPrint("getIndication Status Code: ${response.statusCode}");
+        debugPrint("getIndication Response Body: ${response.body}");
+        List values = [];
+        values = jsonDecode(response.body);
+        if (response.body == null || response.body == "[]") {
+          setState(() {
+            isAvailable = false;
+            isLoading = false;
+          });
+        } else {
+          if (values.isNotEmpty) {
+            for (int i = 0; i < values.length; i++) {
+              if (values[i] != null) {
+                Map<String, dynamic> map = values[i];
+                indicationList.add(IndicationModel.fromJson(map));
+                setState(() {
+                  indicationList;
+                });
+                setState(() {
+                  isLoading = false;
+                  // isAvailable = false;
+                });
+              }
+            }
+          }
+
+          getUnSelectedChapterSymptoms();
+          getSelectedChapterSymptoms();
+        }
+      }
+    }
+  }
 }
+
+// List<CheckBoxModel> checkBoxModelList = [];
+// Future fetchCheckBoxDetails() async {
+//   checkBoxModelList.clear();
+//   Uri myUri = Uri.parse(
+//       "https://mettlecrowsolutions.com/apps/apis/biochem_new/get-selected-symps.php?cat_id=${_chapterModel!.id}&user_id=${Constant.id}");
+//   Response response = await get(myUri);
+//   if (response.statusCode == 200) {
+//     debugPrint("fetchCheckBoxDetails Status Code: ${response.statusCode}");
+//     debugPrint("fetchCheckBoxDetails Response Body:} :: ${response.body}");
+//     List<dynamic> values = <dynamic>[];
+//     values = jsonDecode(response.body);
+//     if (values.isNotEmpty) {
+//       for (int i = 0; i < values.length; i++) {
+//         if (values[i] != null) {
+//           Map<String, dynamic> map = values[i];
+//           checkBoxModelList.add(CheckBoxModel.fromJson(map));
+//         }
+//       }
+//     }
+//   }
+// }
 
 // SizedBox(
 //   height: MediaQuery.of(context).size.height / 2.5,

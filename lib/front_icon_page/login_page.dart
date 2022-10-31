@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, unnecessary_null_comparison
+
 import 'dart:convert';
 import 'dart:ui';
 import 'package:biochemic_master/front_icon_page/model/LoginReq.dart';
@@ -20,8 +22,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController emailController =
-      TextEditingController(text: "user1@gmail.com",);
+  TextEditingController emailController = TextEditingController(
+    text: "user1@gmail.com",
+  );
   TextEditingController passwordController =
       TextEditingController(text: "123456");
   bool showPassword = false;
@@ -45,17 +48,17 @@ class _LoginPageState extends State<LoginPage> {
                       backgroundImage: Images.logoImg,
                     ),
                     const SizedBox(height: 10),
-                    const Text("Login",
+                    Text(Constant.language == '?lang=h' ? "लॉगिन" : "Login",
                         style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.3)),
                     const SizedBox(height: 10),
                     Row(
-                      children: const [
+                      children: [
                         SizedBox(width: 6),
                         Text(
-                          "Email",
+                          Constant.language == '?lang=h' ? "ईमेल" : "Email",
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w800),
                         ),
@@ -65,15 +68,18 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                         controller: emailController,
                         textCapitalization: TextCapitalization.sentences,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(16),
-                            hintText: 'Enter Email',
+                            hintText: Constant.language == '?lang=h'
+                                ? "ईमेल लिखे"
+                                : 'Enter Email',
                             helperMaxLines: 2,
                             hintMaxLines: 2,
-                            focusedBorder: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(4)),
-                                borderSide:
-                                BorderSide(width: 1, color: Constant.primaryColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                                borderSide: BorderSide(
+                                    width: 1, color: Constant.primaryColor)),
                             border: OutlineInputBorder(
                                 borderSide:
                                     BorderSide(color: Constant.primaryColor))
@@ -81,16 +87,20 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                         validator: (value) {
                           if (value == null) {
-                            return "Please Enter Email";
+                            return Constant.language == '?lang=h'
+                                ? "कृपया ईमेल दर्ज करे"
+                                : "Please Enter Email";
                           }
                           return null;
                         }),
                     const SizedBox(height: 10),
                     Row(
-                      children: const [
+                      children: [
                         SizedBox(width: 6),
                         Text(
-                          "Password",
+                          Constant.language == '?lang=h'
+                              ? "पासवर्ड"
+                              : "Password",
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w600),
                         ),
@@ -108,18 +118,23 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: () => setState(
                                     () => showPassword = !showPassword),
                                 color: Constant.primaryColor),
-                            contentPadding: const EdgeInsets.all(16),
-                            hintText: 'Enter Password',
+                            contentPadding:  EdgeInsets.all(16),
+                            hintText: Constant.language == '?lang=h'
+                                ? "पासवर्ड लिखे"
+                                : 'Enter Password',
                             focusedBorder: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(4)),
-                                borderSide:
-                                BorderSide(width: 1, color: Constant.primaryColor)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                                borderSide: BorderSide(
+                                    width: 1, color: Constant.primaryColor)),
                             border: const OutlineInputBorder(
                                 borderSide:
                                     BorderSide(color: Constant.primaryColor))),
                         validator: (value) {
                           if (value == null) {
-                            return "Please Enter Password";
+                            return Constant.language == '?lang=h'
+                                ? "कृपया पासवर्ड दर्ज करे"
+                                : "Please Enter Password";
                           }
                           return null;
                         }),
@@ -143,11 +158,13 @@ class _LoginPageState extends State<LoginPage> {
                             },
                             style: ElevatedButton.styleFrom(
                                 primary: Constant.primaryColor),
-                            child: const Padding(
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 8),
                               child: Text(
-                                'Login',
+                                Constant.language == '?lang=h'
+                                    ? "लॉगिन"
+                                    : 'Login',
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
@@ -162,14 +179,18 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       child: RichText(
                         text: TextSpan(
-                          text: "Don't have an account? ",
+                          text: Constant.language == '?lang=h'
+                              ? "कोई खाता नहीं है? "
+                              : "Don't have an account? ",
                           style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 14,
                               fontStyle: FontStyle.italic),
-                          children: const <TextSpan>[
+                          children: <TextSpan>[
                             TextSpan(
-                              text: "Sign Up",
+                              text: Constant.language == '?lang=h'
+                                  ? " साइन अप"
+                                  : " Sign Up",
                               style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.black,
@@ -201,13 +222,15 @@ class _LoginPageState extends State<LoginPage> {
       debugPrint("login Status Code: ${response.statusCode}");
 
       if (response.body != null && response.body != "[]") {
-        Fluttertoast.showToast(msg: "Login Successfully");
+        Fluttertoast.showToast(
+            msg: Constant.language == '?lang=h'
+                ? "सफलतापूर्वक लॉगिन हुआ"
+                : "Login Successfully");
         LocalDataSaver.saveLoginData(true);
-
 
         List values = [];
         values = jsonDecode(response.body);
-        List<LoginRequest> detailsList=[];
+        List<LoginRequest> detailsList = [];
         if (values.isNotEmpty) {
           for (int i = 0; i < values.length; i++) {
             if (values[i] != null) {
@@ -228,12 +251,14 @@ class _LoginPageState extends State<LoginPage> {
         Constant.email = (await LocalDataSaver.getEmail())!;
         Constant.password = (await LocalDataSaver.getPassword())!;
         Constant.id = (await LocalDataSaver.getID())!;
-        Constant.name =(await LocalDataSaver.getName())!;
-
+        Constant.name = (await LocalDataSaver.getName())!;
+        Navigator.pop(context);
         await Navigator.pushReplacementNamed(context, AppRoutes.FrontPage);
-
       } else {
-        Fluttertoast.showToast(msg: "Invalid Login");
+        Fluttertoast.showToast(
+            msg: Constant.language == "?lang=h"
+                ? "अमान्य लॉगिन"
+                : "Invalid Login");
       }
     }
   }

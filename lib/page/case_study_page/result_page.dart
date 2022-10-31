@@ -16,21 +16,6 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
-  List nameList = [
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-    "Symptoms",
-  ];
   GetResultModel? _getResultModel;
   String? title;
 
@@ -52,20 +37,25 @@ class _ResultPageState extends State<ResultPage> {
 
       List<dynamic> values = <dynamic>[];
       values = jsonDecode(response.body);
-      if (values.isNotEmpty) {
-        for (int i = 0; i < values.length; i++) {
-          if (values[i] != null) {
-            Map<String, dynamic> map = values[i];
-            getResultRemCountDetailsModelList
-                .add(RecordRemCountDetailsModel.fromJson(map));
-            setState(() {});
-
-            // subsId = subsId.substring(1, subsId.length - 1);
-            // print("subsId: $subsId");
-            // print("subsId: $subsId");
-            setState(() {
-              isLoading = false;
-            });
+      if (response.body == null || response.body == "[]") {
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        if (values.isNotEmpty) {
+          for (int i = 0; i < values.length; i++) {
+            if (values[i] != null) {
+              Map<String, dynamic> map = values[i];
+              getResultRemCountDetailsModelList
+                  .add(RecordRemCountDetailsModel.fromJson(map));
+              if (mounted) {
+                setState(() {
+                  isLoading = false;
+                });
+              } else {
+                isLoading = false;
+              }
+            }
           }
         }
       }
@@ -75,7 +65,8 @@ class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
     if (_getResultModel == null) {
-      _getResultModel = ModalRoute.of(context)?.settings.arguments as GetResultModel?;
+      _getResultModel =
+          ModalRoute.of(context)?.settings.arguments as GetResultModel?;
       getRemSympDetailsCount();
     }
     return Scaffold(
@@ -85,14 +76,16 @@ class _ResultPageState extends State<ResultPage> {
         backgroundColor: Constant.primaryColor,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Text(
-                "${_getResultModel!.rem!.split(',')[0].split("-")[1]} Symptoms Covered",
+                Constant.language == '?lang=h'
+                    ? "लक्षण कवर: ${_getResultModel!.rem!.split(',')[0].split("-")[1]}"
+                    : "Symptoms Covered: ${_getResultModel!.rem!.split(',')[0].split("-")[1]}",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
             ),
@@ -102,38 +95,35 @@ class _ResultPageState extends State<ResultPage> {
                     ? SizedBox(
                         height: MediaQuery.of(context).size.height / 1.5,
                         width: MediaQuery.of(context).size.width,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 4,
-                          ),
-                        ))
+                        child: Center(
+                            child: CircleProgressIndicator.circleIndicator))
                     : ListView.builder(
                         // itemCount: nameList.length,
                         itemCount: getResultRemCountDetailsModelList.length,
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           RecordRemCountDetailsModel item =
                               getResultRemCountDetailsModelList[index];
                           return Padding(
-                            padding:  EdgeInsets.fromLTRB(2, 8, 2, 8),
+                            padding: EdgeInsets.fromLTRB(2, 8, 2, 8),
                             child: Card(
                               color: Constant.primaryColor,
                               shape: CardShape.shape,
                               shadowColor: Constant.primaryColor,
                               elevation: CardShape.elevation,
                               child: Padding(
-                                padding:  EdgeInsets.symmetric(
+                                padding: EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text("${item.categoryName}",
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 18)),
                                     Text("${item.indication}",
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                             color: Colors.white)),

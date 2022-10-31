@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:convert';
 import 'dart:ui';
 import 'package:biochemic_master/Shared/constant.dart';
@@ -53,105 +55,104 @@ class _DetailsPageState extends State<DetailsPage> {
   @override
   Widget build(BuildContext context) {
     if (_searchIndModel == null) {
-      _searchIndModel = ModalRoute.of(context)?.settings.arguments as SearchIndModel?;
+      _searchIndModel =
+          ModalRoute.of(context)?.settings.arguments as SearchIndModel?;
       getRemediesInd();
     }
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(_searchIndModel!.remName!),
-        centerTitle: true,
-        backgroundColor: Constant.primaryColor,
-      ),
+          title: Text(_searchIndModel!.remName!),
+          centerTitle: true,
+          backgroundColor: Constant.primaryColor),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(18, 8, 10, 4),
+                padding: EdgeInsets.fromLTRB(18, 8, 10, 4),
                 child: Row(
-                  children: const [
-                    Text("Indications",
+                  children: [
+                    Text(
+                        Constant.language == '?lang=h'
+                            ? "संकेत"
+                            : "Indications",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 child: Column(
                   children: [
                     if (isLoading == true)
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                                height: MediaQuery.of(context).size.width / 3),
-                            const CircularProgressIndicator(strokeWidth: 4),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.width / 2.5),
-                          ],
-                        ),
-                      )
+                          padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.width / 3),
+                              CircleProgressIndicator.circleIndicator,
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.width / 2.5)
+                            ],
+                          ))
                     else if (getRemediesIndModelList.isNotEmpty)
                       Card(
                         shadowColor: Constant.primaryColor,
                         shape: CardShape.shape,
                         elevation: CardShape.elevation,
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
                           child: ListView.builder(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
-                            physics: const NeverScrollableScrollPhysics(),
+                            physics: NeverScrollableScrollPhysics(),
                             itemCount: getRemediesIndModelList.length,
                             itemBuilder: (context, index) {
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
+                                padding: EdgeInsets.symmetric(vertical: 8),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   // crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      children: [
-                                        const SizedBox(width: 10),
-                                        bulletContainer(),
-                                        const SizedBox(width: 10)
-                                      ],
-                                    ),
+                                    Row(children: [
+                                      SizedBox(width: 10),
+                                      bulletContainer(),
+                                      SizedBox(width: 10)
+                                    ]),
                                     Expanded(
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text:
-                                              "${getRemediesIndModelList[index].categoryName}: ",
-                                          style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontSize: 14,
-                                              fontStyle: FontStyle.italic),
-                                          children: <TextSpan>[
-                                            TextSpan(
-                                              text:
-                                                  getRemediesIndModelList[index]
-                                                      .indication,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal),
-                                            )
-                                          ],
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: true,
-                                      ),
-                                    )
+                                        child: RichText(
+                                            text: TextSpan(
+                                                text:
+                                                    "${getRemediesIndModelList[index].categoryName}: ",
+                                                style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 14,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                                children: <TextSpan>[
+                                                  TextSpan(
+                                                      text:
+                                                          getRemediesIndModelList[
+                                                                  index]
+                                                              .indication,
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontStyle:
+                                                              FontStyle.normal))
+                                                ]),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true))
                                   ],
                                 ),
                               );
@@ -161,20 +162,22 @@ class _DetailsPageState extends State<DetailsPage> {
                       )
                     else
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
+                        padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
                                 height: MediaQuery.of(context).size.width / 3),
-                            const Text("No indication found.",
+                            Text(
+                                Constant.language == '?lang=h'
+                                    ? "कोई संकेत नहीं मिला"
+                                    : "No indication found.",
                                 maxLines: 3,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.w600)),
                             SizedBox(
-                              height: MediaQuery.of(context).size.width / 2.5,
-                            ),
+                                height: MediaQuery.of(context).size.width / 2.5)
                           ],
                         ),
                       )
@@ -190,11 +193,9 @@ class _DetailsPageState extends State<DetailsPage> {
 
   Widget bulletContainer() {
     return Container(
-      height: 8,
-      width: 8,
-      decoration:
-          const BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
-    );
+        height: 8,
+        width: 8,
+        decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle));
   }
 }
 

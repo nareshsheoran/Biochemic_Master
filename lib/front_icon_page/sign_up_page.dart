@@ -1,9 +1,10 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:biochemic_master/Shared/constant.dart';
 import 'package:biochemic_master/Shared/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -16,11 +17,11 @@ class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController emailController =
-  TextEditingController(text: "user1@gmail.com");
+      TextEditingController(text: "user1@gmail.com");
   TextEditingController passwordController =
-  TextEditingController(text: "123456");
+      TextEditingController(text: "123456");
   TextEditingController confirmPasswordController =
-  TextEditingController(text: "123456");
+      TextEditingController(text: "123456");
   bool showPassword = false;
   bool showCnPassword = false;
 
@@ -42,40 +43,44 @@ class _SignUpPageState extends State<SignUpPage> {
                       radius: 50,
                       backgroundImage: Images.logoImg,
                     ),
-                    const Text("Sign up", style: TextStyle(fontSize: 24)),
+                    Text(Constant.language == '?lang=h' ? "साइन अप" : "Sign up",
+                        style: TextStyle(fontSize: 24)),
                     const SizedBox(height: 10),
                     Row(
-                      children: const [
+                      children: [
                         SizedBox(width: 6),
                         Text(
-                          "Email",
+                          Constant.language == '?lang=h' ? "ईमेल" : "Email",
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     TextFormField(
                       controller: emailController,
                       textCapitalization: TextCapitalization.sentences,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                           contentPadding: EdgeInsets.all(16),
-                          hintText: 'Enter Email',
+                          hintText: Constant.language == '?lang=h'
+                              ? "ईमेल लिखे"
+                              : 'Enter Email',
                           helperMaxLines: 2,
                           hintMaxLines: 2,
                           focusedBorder: OutlineInputBorder(
                               borderRadius:
-                              BorderRadius.all(Radius.circular(4)),
+                                  BorderRadius.all(Radius.circular(4)),
                               borderSide: BorderSide(
                                   width: 1, color: Constant.primaryColor)),
                           border: OutlineInputBorder(
                               borderSide:
-                              BorderSide(color: Constant.primaryColor))),
-
+                                  BorderSide(color: Constant.primaryColor))),
 
                       validator: (String? value) {
                         return GetUtils.isEmail(value!)
                             ? null
-                            : "Please Enter an email";
+                            : Constant.language == '?lang=h'
+                                ? "कृपया ईमेल दर्ज करे"
+                                : "Please Enter an email";
                       },
                       // validator: (value) {
                       //   if (value == null) {
@@ -86,59 +91,67 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 10),
                     Row(
-                      children: const [
+                      children: [
                         SizedBox(width: 6),
                         Text(
-                          "Password",
+                          Constant.language == '?lang=h'
+                              ? "पासवर्ड"
+                              : "Password",
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     TextFormField(
-                        obscureText: !showPassword,
-                        controller: passwordController,
-                        textCapitalization: TextCapitalization.sentences,
-                        inputFormatters: [LengthLimitingTextInputFormatter(20)],
-                        decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                                icon: const Icon(Icons.remove_red_eye),
-                                onPressed: () =>
-                                    setState(
-                                            () => showPassword = !showPassword),
-                                color: Constant.primaryColor),
-                            focusedBorder: const OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(4)),
-                                borderSide: BorderSide(
-                                    width: 1, color: Constant.primaryColor)),
-                            border: const OutlineInputBorder(
-                                borderSide:
-                                BorderSide(color: Constant.primaryColor)),
-                            contentPadding: const EdgeInsets.all(16),
-                            hintText: 'Enter Password'),
-                        // validator: (value) {
-                        //   if (value == null) {
-                        //     return "Please Enter Password";
-                        //   }
-                        //   return null;
-                        // }
+                      obscureText: !showPassword,
+                      controller: passwordController,
+                      textCapitalization: TextCapitalization.sentences,
+                      inputFormatters: [LengthLimitingTextInputFormatter(20)],
+                      decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                              icon: Icon(Icons.remove_red_eye),
+                              onPressed: () =>
+                                  setState(() => showPassword = !showPassword),
+                              color: Constant.primaryColor),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)),
+                              borderSide: BorderSide(
+                                  width: 1, color: Constant.primaryColor)),
+                          border: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Constant.primaryColor)),
+                          contentPadding: EdgeInsets.all(16),
+                          hintText: Constant.language == '?lang=h'
+                              ? "पासवर्ड लिखे"
+                              : 'Enter Password'),
+                      // validator: (value) {
+                      //   if (value == null) {
+                      //     return "Please Enter Password";
+                      //   }
+                      //   return null;
+                      // }
                       validator: (String? value) {
                         return GetUtils.isLengthGreaterOrEqual(value, 8)
                             ? null
-                            : "Please Enter a proper password of 8 or more characters";
-                      },),
-                    const SizedBox(height: 10),
+                            : Constant.language == '?lang=h'
+                                ? "कृपया 8 या अधिक का पासवर्ड दर्ज करे"
+                                : "Please Enter a proper password of 8 or more characters";
+                      },
+                    ),
+                    SizedBox(height: 10),
                     Row(
-                      children: const [
+                      children: [
                         SizedBox(width: 6),
                         Text(
-                          "Password",
+                          Constant.language == '?lang=h'
+                              ? "पासवर्ड"
+                              : "Password",
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     TextFormField(
                         obscureText: !showCnPassword,
                         controller: confirmPasswordController,
@@ -148,25 +161,27 @@ class _SignUpPageState extends State<SignUpPage> {
                             focusColor: Constant.primaryColor,
                             hoverColor: Constant.primaryColor,
                             suffixIcon: IconButton(
-                                icon: const Icon(Icons.remove_red_eye),
-                                onPressed: () =>
-                                    setState(
-                                            () =>
-                                        showCnPassword = !showCnPassword),
+                                icon: Icon(Icons.remove_red_eye),
+                                onPressed: () => setState(
+                                    () => showCnPassword = !showCnPassword),
                                 color: Constant.primaryColor),
-                            contentPadding: const EdgeInsets.all(16),
-                            hintText: 'Enter Confirm Password',
-                            focusedBorder: const OutlineInputBorder(
+                            contentPadding: EdgeInsets.all(16),
+                            hintText: Constant.language == '?lang=h'
+                                ? "कन्फर्म पासवर्ड लिखे"
+                                : 'Enter Confirm Password',
+                            focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(4)),
+                                    BorderRadius.all(Radius.circular(4)),
                                 borderSide: BorderSide(
                                     width: 1, color: Constant.primaryColor)),
-                            border: const OutlineInputBorder(
+                            border: OutlineInputBorder(
                                 borderSide:
-                                BorderSide(color: Constant.primaryColor))),
+                                    BorderSide(color: Constant.primaryColor))),
                         validator: (value) {
                           if (value == null) {
-                            return "Please Enter Confirm Password";
+                            return Constant.language == '?lang=h'
+                                ? "कृपया कन्फर्म पासवर्ड लिखे"
+                                : "Please Enter Confirm Password";
                           }
                           return null;
                         }),
@@ -188,11 +203,13 @@ class _SignUpPageState extends State<SignUpPage> {
                             },
                             style: ElevatedButton.styleFrom(
                                 primary: Constant.primaryColor),
-                            child: const Padding(
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 8),
                               child: Text(
-                                'Sign Up',
+                                Constant.language == '?lang=h'
+                                    ? "साइन अप"
+                                    : 'Sign Up',
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
@@ -207,14 +224,19 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                       child: RichText(
                         text: TextSpan(
-                          text: "Already have an account? ",
+                          text:
+                          Constant.language == '?lang=h' ?
+                               "आपके पास क्या पहले से खाता मौजूद है? ":
+                               "Already have an account? ",
                           style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 14,
                               fontStyle: FontStyle.italic),
-                          children: const <TextSpan>[
+                          children: <TextSpan>[
                             TextSpan(
-                              text: "Login",
+                              text: Constant.language == '?lang=h'
+                                  ? " लॉगिन"
+                                  : " Login",
                               style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.black,

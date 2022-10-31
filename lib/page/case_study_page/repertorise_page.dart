@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, unnecessary_null_comparison, avoid_print
 
 import 'dart:convert';
 import 'dart:core';
@@ -31,7 +31,10 @@ class _RepertorisePageState extends State<RepertorisePage> {
       Map<String, dynamic> map =
           jsonDecode(response.body) as Map<String, dynamic>;
       if (map != null && map['message'] != null) {
-        Fluttertoast.showToast(msg: map['message']);
+        Fluttertoast.showToast(
+            msg: Constant.language == "?lang=h"
+                ? "लक्षण हटाए गए"
+                : map['message']);
         if (response.statusCode == 200 &&
             map['message'] == "Symptoms Cleared") {
           getResultModelList.clear();
@@ -39,7 +42,8 @@ class _RepertorisePageState extends State<RepertorisePage> {
           // for (int i = 0; i < getResultModelList.length; i++) {
           //   getResultModelList[i].rem = "";}
           setState(() {});
-          Navigator.pop(context);
+          // Navigator.pop(context);
+          Navigator.of(context).pop();
           Navigator.pushReplacementNamed(context, AppRoutes.ChapterPage);
         }
       }
@@ -56,10 +60,11 @@ class _RepertorisePageState extends State<RepertorisePage> {
       isLoading = true;
     });
     http.Response response = await http
-        .get(Uri.parse("${NetworkUtil.getRemCount}user_id=${Constant.id}"));
+        // .get(Uri.parse("${NetworkUtil.getRemCountCh}user_id=${Constant.id}"));
+        .get(Uri.parse(
+            "${NetworkUtil.getRemCountCh}${Constant.language!}&user_id=${Constant.id}"));
 
     if (response.statusCode == 200) {
-      debugPrint("getRemCount Status Code: ${response.statusCode}");
       debugPrint("getRemCount Response Body: ${response.body}");
 
       List<dynamic> values = <dynamic>[];
@@ -69,23 +74,20 @@ class _RepertorisePageState extends State<RepertorisePage> {
           if (values[i] != null) {
             Map<String, dynamic> map = values[i];
             getResultModelList.add(GetResultModel.fromJson(map));
-            setState(() {});
-
             String getRamNameId = getResultModelList[i].rem!.split('-')[0];
             print("getNameId: $getRamNameId");
             ramNameList.add(getRamNameId);
-
             String getRamCountId =
                 getResultModelList[i].rem!.split(',')[0].split("-")[1];
             print("getCountId: $getRamCountId");
             ramCountList.add(getRamCountId);
-
-            // subsId = subsId.substring(1, subsId.length - 1);
-            // print("subsId: $subsId");
-            // print("subsId: $subsId");
-            setState(() {
+            if (mounted) {
+              setState(() {
+                isLoading = false;
+              });
+            } else {
               isLoading = false;
-            });
+            }
           }
         }
       }
@@ -104,157 +106,186 @@ class _RepertorisePageState extends State<RepertorisePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Recommended Remedies"),
-        centerTitle: true,
-        backgroundColor: Constant.primaryColor,
-      ),
+          title: Text(Constant.language == '?lang=h'
+              ? "अनुशंसित उपचार"
+              : "Recommended Remedies"),
+          centerTitle: true,
+          backgroundColor: Constant.primaryColor),
       body: Column(
         children: [
           Expanded(
-            child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: (isLoading)
-                    ? SizedBox(
-                        height: MediaQuery.of(context).size.width,
-                        width: MediaQuery.of(context).size.width,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 6,
-                          ),
-                        ))
-                    : ListView.builder(
-                        itemCount: ramCountList.length,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        // physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(
-                                  context, AppRoutes.ResultPage,
-                                  arguments: getResultModelList[index]);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Card(
-                                elevation: CardShape.elevation,
-                                color: Constant.primaryColor,
-                                shadowColor: Constant.primaryColor,
-                                shape: CardShape.shape,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      const SizedBox(width: 6),
-                                      CircleAvatar(
-                                        backgroundColor: Colors.white,
-                                        radius: 24,
-                                        // backgroundImage: Images.logoImg,
+              child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: (isLoading)
+                      ? SizedBox(
+                          height: MediaQuery.of(context).size.width,
+                          width: MediaQuery.of(context).size.width,
+                          child: Center(
+                              child: CircleProgressIndicator.circleIndicator))
+                      : ListView.builder(
+                          itemCount: ramCountList.length,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          // physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            print(ramCountList[index]);
+                            return GestureDetector(
+                              onTap: () {
+                                ramCountList[index] == "0"
+                                    ? Fluttertoast.showToast(
+                                        msg: Constant.language == '?lang=h'
+                                            ? "कोई भी कवर किया हुआ लक्षण नहीं मिला"
+                                            : "Not find any covered Symptoms")
+                                    : Navigator.pushNamed(
+                                        context, AppRoutes.ResultPage,
+                                        arguments: getResultModelList[index]);
+                              },
+                              child: ramCountList[index] == "0"
+                                  ? SizedBox()
+                                  : Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Card(
+                                        elevation: CardShape.elevation,
+                                        color: Constant.primaryColor,
+                                        shadowColor: Constant.primaryColor,
+                                        shape: CardShape.shape,
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Row(
                                             children: [
-                                              Text("Rank",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                      FontWeight.bold,
-                                                      color: Constant
-                                                          .primaryColor)),
-                                              Text((index + 1).toString(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                      FontWeight.bold,
-                                                      fontSize: 14,
-                                                      color: Constant
-                                                          .primaryColor)),
+                                              SizedBox(width: 6),
+                                              CircleAvatar(
+                                                backgroundColor: Colors.white,
+                                                radius: 25,
+                                                // backgroundImage: Images.logoImg,
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(8),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                          Constant.language ==
+                                                                  '?lang=h'
+                                                              ? "रैंक"
+                                                              : "Rank",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Constant
+                                                                  .primaryColor)),
+                                                      Text(
+                                                          (index + 1)
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                              color: Constant
+                                                                  .primaryColor)),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 12),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text((ramNameList[index]),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 20)),
+                                                  Text(
+                                                      (Constant.language ==
+                                                              '?lang=h'
+                                                          ? "कवर किए गए लक्षण- ${ramCountList[index]}"
+                                                          : "Symptoms Covered- ${ramCountList[index]}"),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16,
+                                                          color: Colors.white))
+                                                ],
+                                              ),
                                             ],
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            (ramNameList[index]),
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
-                                          ),
-                                          Text(
-                                            ("Symptoms Covered- ${ramCountList[index]}"),
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Colors.white),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
+                                    ),
+                            );
+                          },
+                        ))),
+          (isLoading == true)
+              ? SizedBox()
+              : Padding(
+                  padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.warning,
+                            headerAnimationLoop: false,
+                            animType: AnimType.bottomSlide,
+                            title: Constant.language == '?lang=h'
+                                ? "चेतावनी"
+                                : 'Warning',
+                            titleTextStyle: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20),
+                            desc: Constant.language == '?lang=h'
+                                ? "क्या आप निश्चित रूप से चुनिंदा लक्षणों को हटाना चाहते हैं?"
+                                : 'Are you sure to remove all symptoms record?',
+                            descTextStyle: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                            buttonsTextStyle: TextStyle(color: Colors.black),
+                            showCloseIcon: true,
+                            btnCancelOnPress: () {},
+                            btnOkText:
+                                Constant.language == '?lang=h' ? "हाँ" : "OK",
+                            btnCancelText: Constant.language == '?lang=h'
+                                ? "नहीं"
+                                : "Cancel",
+                            btnOkOnPress: () {
+                              setState(() {
+                                removeSymptoms();
+                              });
+                            },
+                          ).show();
                         },
-                      )),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    AwesomeDialog(
-                      context: context,
-                      dialogType: DialogType.WARNING,
-                      headerAnimationLoop: false,
-                      animType: AnimType.BOTTOMSLIDE,
-                      title: 'Warning',
-                      titleTextStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 20),
-                      desc: 'Are you sure to remove all symptoms record?',
-                      descTextStyle: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
-                      buttonsTextStyle: const TextStyle(color: Colors.black),
-                      showCloseIcon: true,
-                      btnCancelOnPress: () {},
-                      btnOkOnPress: () {
-                        setState(() {
-                          removeSymptoms();
-                        });
-                      },
-                    ).show();
-                  },
-                  child: Card(
-                    color: Colors.red,
-                    shadowColor: Constant.primaryColor,
-                    shape: CardShape.shape,
-                    elevation: CardShape.elevation,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 42, vertical: 8),
-                      child: Row(
-                        children: const [
-                          Text(
-                            "Remove Symptoms",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                        child: Card(
+                          color: Colors.red,
+                          shadowColor: Constant.primaryColor,
+                          shape: CardShape.shape,
+                          elevation: CardShape.elevation,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 42, vertical: 8),
+                            child: Row(
+                              children: [
+                                Text(
+                                    Constant.language == '?lang=h'
+                                        ? "लक्षण हटाए"
+                                        : "Remove Symptoms",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold))
+                              ],
+                            ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
         ],
       ),
     );

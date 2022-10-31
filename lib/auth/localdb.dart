@@ -1,3 +1,5 @@
+// ignore_for_file: await_only_futures
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalDataSaver {
@@ -6,6 +8,7 @@ class LocalDataSaver {
   static String emailKey = "EmailKey";
   static String passwordKey = "PasswordKey";
   static String imgKey = "ImgKey";
+  static String languageKey = "ImgKey";
   static String logKey = "LogKey";
 
   static Future<bool> saveID(String? userID) async {
@@ -56,6 +59,16 @@ class LocalDataSaver {
   static Future<String?> getPassword() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(passwordKey);
+  }
+
+  static Future<bool> saveLanguage(String? userLanguage) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setString(languageKey, userLanguage!);
+  }
+
+  static Future<String?> getLanguage() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.getString(languageKey);
   }
 
   static Future<bool> saveLoginData(bool? isUserLoggedIn) async {

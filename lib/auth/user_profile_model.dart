@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_this, prefer_collection_literals
+
 class UserProfileModel {
   String? userId;
   String? userName;
@@ -6,7 +8,11 @@ class UserProfileModel {
   String? userImg;
 
   UserProfileModel({
-    this.userId, this.userName, this.userPassword, this.userEmail, this.userImg
+    this.userId,
+    this.userName,
+    this.userPassword,
+    this.userEmail,
+    this.userImg,
   });
 
   UserProfileModel.fromJson(Map<String, dynamic> json) {
@@ -15,7 +21,7 @@ class UserProfileModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['id'] = this.userId;
     data['name'] = this.userName;
     return data;
